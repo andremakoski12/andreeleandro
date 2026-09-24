@@ -111,3 +111,12 @@ papers.forEach((paper) => {
   const p = new Paper();
   p.init(paper);
 });
+
+const musica = document.getElementById("musica");
+
+function iniciarMusica() {
+  musica.play().catch(() => {});
+  document.removeEventListener("pointerdown", iniciarMusica);
+}
+
+document.addEventListener("pointerdown", iniciarMusica);
