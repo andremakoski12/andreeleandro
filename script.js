@@ -1,87 +1,125 @@
 let highestZ = 1;
 
 class Paper {
-  holdingPaper = false;
-  mouseTouchX = 0;
-  mouseTouchY = 0;
-  mouseX = 0;
-  mouseY = 0;
-  prevMouseX = 0;
-  prevMouseY = 0;
-  velX = 0;
-  velY = 0;
-  rotation = Math.random() * 30 - 15;
-  currentPaperX = 0;
-  currentPaperY = 0;
-  rotating = false;
+holdingPaper = false;
 
-  init(paper) {
+mouseX = 0;
+mouseY = 0;
 
-    paper.addEventListener("pointerdown", (e) => {
+prevMouseX = 0;
+prevMouseY = 0;
 
-      if (this.holdingPaper) return;
+velX = 0;
+velY = 0;
 
-      this.holdingPaper = true;
+rotation = Math.random() * 30 - 15;
 
-      paper.style.zIndex = highestZ;
-      highestZ++;
+currentPaperX = 0;
+currentPaperY = 0;
 
-      this.mouseX = e.clientX;
-      this.mouseY = e.clientY;
+init(paper) {
 
-      this.prevMouseX = e.clientX;
-      this.prevMouseY = e.clientY;
+```
+// Garante que o navegador trate o elemento como área de toque/arraste
+paper.style.touchAction = "none";
+paper.style.userSelect = "none";
+paper.style.webkitUserSelect = "none";
 
-      this.mouseTouchX = e.clientX;
-      this.mouseTouchY = e.clientY;
+paper.addEventListener("pointerdown", (e) => {
 
-      paper.setPointerCapture(e.pointerId);
-
-      e.preventDefault();
-    });
-
-    paper.addEventListener("pointermove", (e) => {
-
-      if (!this.holdingPaper) return;
-
-      this.mouseX = e.clientX;
-      this.mouseY = e.clientY;
-
-      this.velX = this.mouseX - this.prevMouseX;
-      this.velY = this.mouseY - this.prevMouseY;
-
-      this.currentPaperX += this.velX;
-      this.currentPaperY += this.velY;
-
-      this.prevMouseX = this.mouseX;
-      this.prevMouseY = this.mouseY;
-
-      paper.style.transform =
-        `translateX(${this.currentPaperX}px) 
-         translateY(${this.currentPaperY}px) 
-         rotateZ(${this.rotation}deg)`;
-
-      e.preventDefault();
-    });
-
-    const stopDragging = (e) => {
-
-      this.holdingPaper = false;
-      this.rotating = false;
-
-      if (paper.hasPointerCapture(e.pointerId)) {
-        paper.releasePointerCapture(e.pointerId);
-      }
-    };
-
-    paper.addEventListener("pointerup", stopDragging);
-    paper.addEventListener("pointercancel", stopDragging);
+  // Apenas botão esquerdo no mouse
+  if (e.pointerType === "mouse" && e.button !== 0) {
+    return;
   }
+
+  e.preventDefault();
+
+  this.holdingPaper = true;
+
+  // Coloca o papel na frente
+  paper.style.zIndex = highestZ;
+  highestZ++;
+
+  // Guarda posição inicial
+  this.mouseX = e.clientX;
+  this.mouseY = e.clientY;
+
+  this.prevMouseX = e.clientX;
+  this.prevMouseY = e.clientY;
+
+  // Captura o dedo/mouse mesmo se sair do elemento
+  try {
+    paper.setPointerCapture(e.pointerId);
+  } catch (error) {
+    // Alguns navegadores podem não suportar captura
+  }
+});
+
+paper.addEventListener("pointermove", (e) => {
+
+  if (!this.holdingPaper) {
+    return;
+  }
+
+  e.preventDefault();
+
+  // Calcula quanto o dedo/mouse se moveu
+  this.velX = e.clientX - this.prevMouseX;
+  this.velY = e.clientY - this.prevMouseY;
+
+  // Atualiza posição do papel
+  this.currentPaperX += this.velX;
+  this.currentPaperY += this.velY;
+
+  // Guarda posição atual
+  this.prevMouseX = e.clientX;
+  this.prevMouseY = e.clientY;
+
+  // Aplica movimento mantendo a rotação
+  paper.style.transform =
+    `translate3d(
+      ${this.currentPaperX}px,
+      ${this.currentPaperY}px,
+      0
+    ) rotateZ(${this.rotation}deg)`;
+});
+
+const stopDragging = (e) => {
+
+  if (!this.holdingPaper) {
+    return;
+  }
+
+  e.preventDefault();
+
+  this.holdingPaper = false;
+
+  try {
+    if (paper.hasPointerCapture(e.pointerId)) {
+      paper.releasePointerCapture(e.pointerId);
+    }
+  } catch (error) {
+    // Ignora caso o navegador não suporte
+  }
+};
+
+paper.addEventListener("pointerup", stopDragging);
+paper.addEventListener("pointercancel", stopDragging);
+paper.addEventListener("lostpointercapture", () => {
+  this.holdingPaper = false;
+});
+```
+
+}
 }
 
-const papers = Array.from(document.querySelectorAll(".paper"));
+const papers = Array.from(
+document.querySelectorAll(".paper")
+);
 
-papers.forEach(paper => {
-  const p = new Paper();
-  p.init(paper);
+papers.forEach((paper) => {
+
+const p = new Paper();
+
+p.init(paper);
 });
