@@ -114,9 +114,10 @@ papers.forEach((paper) => {
 
 const musica = document.getElementById("musica");
 
-function iniciarMusica() {
-  musica.play().catch(() => {});
-  document.removeEventListener("pointerdown", iniciarMusica);
-}
-
-document.addEventListener("pointerdown", iniciarMusica);
+document.addEventListener("pointerdown", () => {
+  if (musica.paused) {
+    musica.play().catch((erro) => {
+      console.log("Não foi possível iniciar a música:", erro);
+    });
+  }
+}, { once: true });
