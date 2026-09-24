@@ -107,7 +107,7 @@ class Paper {
 
 const musica = document.getElementById("musica");
 
-document.addEventListener("pointerdown", () => {
+function iniciarMusica() {
 
   if (!musica.paused) return;
 
@@ -115,13 +115,16 @@ document.addEventListener("pointerdown", () => {
 
   musica.play().then(() => {
 
-    const duracaoFade = 10000; // 10 segundos
+    const duracaoFade = 10000;
     const inicio = performance.now();
 
     function aumentarVolume(agora) {
 
       const tempoPassado = agora - inicio;
-      const progresso = Math.min(tempoPassado / duracaoFade, 1);
+      const progresso = Math.min(
+        tempoPassado / duracaoFade,
+        1
+      );
 
       musica.volume = progresso;
 
@@ -137,5 +140,4 @@ document.addEventListener("pointerdown", () => {
   }).catch((erro) => {
     console.log("Não foi possível iniciar a música:", erro);
   });
-
-}, { once: true });
+}
