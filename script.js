@@ -105,19 +105,37 @@ class Paper {
   }
 }
 
-const papers = document.querySelectorAll(".paper");
-
-papers.forEach((paper) => {
-  const p = new Paper();
-  p.init(paper);
-});
-
 const musica = document.getElementById("musica");
 
 document.addEventListener("pointerdown", () => {
-  if (musica.paused) {
-    musica.play().catch((erro) => {
-      console.log("Não foi possível iniciar a música:", erro);
-    });
-  }
+
+  if (!musica.paused) return;
+
+  musica.volume = 0;
+
+  musica.play().then(() => {
+
+    const duracaoFade = 10000; // 10 segundos
+    const inicio = performance.now();
+
+    function aumentarVolume(agora) {
+
+      const tempoPassado = agora - inicio;
+      const progresso = Math.min(tempoPassado / duracaoFade, 1);
+
+      musica.volume = progresso;
+
+      if (progresso < 1) {
+        requestAnimationFrame(aumentarVolume);
+      } else {
+        musica.volume = 1;
+      }
+    }
+
+    requestAnimationFrame(aumentarVolume);
+
+  }).catch((erro) => {
+    console.log("Não foi possível iniciar a música:", erro);
+  });
+
 }, { once: true });
