@@ -19,7 +19,7 @@ currentPaperY = 0;
 
 init(paper) {
 
-```
+
 // Garante que o navegador trate o elemento como área de toque/arraste
 paper.style.touchAction = "none";
 paper.style.userSelect = "none";
@@ -108,7 +108,7 @@ paper.addEventListener("pointercancel", stopDragging);
 paper.addEventListener("lostpointercapture", () => {
   this.holdingPaper = false;
 });
-```
+
 
 }
 }
